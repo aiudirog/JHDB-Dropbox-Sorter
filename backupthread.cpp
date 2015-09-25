@@ -6,6 +6,7 @@
 #include <QDateTime>
 #include <QListWidgetItem>
 #include <QSettings>
+#include <QList>
 
 bool BackUpThread::running = false;
 
@@ -15,35 +16,23 @@ BackUpThread::~BackUpThread() { }
 
 void BackUpThread::run() {
     if(running) {
-        output("Currently backing up. Please wait.");
+        output("Currently copying. Please wait.");
         return;
     }
     running = true;
-    output("Starting back-up.");
+    output("Scanning directory...");
 
-    int total_files = 0;
+    int total_files = count_files(dropbox);
     int processed_files = 0;
 
-    foreach(QString dir, dirs_to_back_up) {
-        total_files += count_files(dir);
-    }
-
-    foreach(QString org_dir, dirs_to_back_up) {
-        QString new_dir = QDir(dir_to_back_up_to).filePath(QDir(org_dir).dirName());
-        if(!QDir(new_dir).exists()) {
-            QDir().mkdir(new_dir);
-        }
-
-        backup_modified_files(org_dir, new_dir, &total_files, &processed_files);
-        remove_deleted_files(org_dir, new_dir);
-    }
-    output("Back-up complete: "+QDateTime::currentDateTime().toString());
+    copy_files(dropbox, archive, &total_files, &processed_files);
+    output("Copying complete: "+QDateTime::currentDateTime().toString());
     running = false;
 }
 
-void BackUpThread::set_arguments(QList<QString> org_dirs, QString new_dir) {
-    this->dirs_to_back_up = org_dirs;
-    this->dir_to_back_up_to = new_dir;
+void BackUpThread::set_arguments(QString dropbox_dir, QString archive_dir) {
+    this->dropbox = dropbox_dir;
+    this->archive = archive_dir;
 }
 
 int BackUpThread::count_files(QString directory) {
@@ -66,25 +55,23 @@ int BackUpThread::count_files(QString directory) {
     return num_of_files;
 }
 
-void BackUpThread::backup_modified_files(QString org_dir, QString new_dir, int *total_files, int *processed_files) {
-    // Back-Up files in current directory
+void BackUpThread::copy_files(QString new_dir, QString org_dir, int *total_files, int *processed_files) {
+    QList<QString> filters;
+    filters << "RAW" << ".mp4" << ".wav" << "HS";
+
+    // Copy files in current directory
     QDirIterator current_dir_files(org_dir, QDir::Files | QDir::NoDotAndDotDot);
     while (current_dir_files.hasNext()) {
         QString next_file = current_dir_files.next();
-        QString next_file_copy = QString::fromUtf16(next_file.utf16());
-        next_file_copy.replace(org_dir, new_dir);
-        if (!QFile::exists(next_file_copy)) {
-            QFile::copy(next_file, next_file_copy);
-            output("Creating back-up of: "+next_file);
-        } else if (QFileInfo(next_file).lastModified() > QFileInfo(next_file_copy).lastModified()) {
-            QFile::remove(next_file_copy);
-            QFile::copy(next_file, next_file_copy);
-            output("Updating back-up of: "+next_file);
+        if (!check_filter(next_file, filters)) {
+            QString next_file_copy = QString::fromUtf16(next_file.utf16());
+            next_file_copy.replace(org_dir, new_dir);
+            copy_file(next_file, next_file_copy);
         }
         (*processed_files)++;
         update_progress(total_files, processed_files);
     }
-    // Back-Up files in subdirectories
+    // Copy files in subdirectories
     QDirIterator dirs(org_dir, QDir::Dirs | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
     while (dirs.hasNext()) {
         QString next = dirs.next();
@@ -96,15 +83,10 @@ void BackUpThread::backup_modified_files(QString org_dir, QString new_dir, int *
         QDirIterator files(next, QDir::Files | QDir::NoDotAndDotDot);
         while (files.hasNext()) {
             QString next_file = files.next();
-            QString next_file_copy = QString::fromUtf16(next_file.utf16());
-            next_file_copy.replace(org_dir, new_dir);
-            if (!QFile::exists(next_file_copy)) {
-                QFile::copy(next_file, next_file_copy);
-                output("Creating back-up of: "+next_file);
-            } else if (QFileInfo(next_file).lastModified() > QFileInfo(next_file_copy).lastModified()) {
-                QFile::remove(next_file_copy);
-                QFile::copy(next_file, next_file_copy);
-                output("Updating back-up of: "+next_file);
+            if (!check_filter(next_file, filters)) {
+                QString next_file_copy = QString::fromUtf16(next_file.utf16());
+                next_file_copy.replace(org_dir, new_dir);
+                copy_file(next_file, next_file_copy);
             }
             (*processed_files)++;
             update_progress(total_files, processed_files);
@@ -112,35 +94,24 @@ void BackUpThread::backup_modified_files(QString org_dir, QString new_dir, int *
     }
 }
 
-void BackUpThread::remove_deleted_files(QString org_dir, QString new_dir) {
-    QDirIterator current_copy_dir_files(new_dir, QDir::Files | QDir::NoDotAndDotDot);
-    while (current_copy_dir_files.hasNext()) {
-        QString next_file = current_copy_dir_files.next();
-        QString next_file_org = QString::fromUtf16(next_file.utf16());
-        next_file_org.replace(new_dir, org_dir);
-        if (!QFile::exists(next_file_org)) {
-            QFile::remove(next_file);
-            output("Removing: "+next_file);
+bool BackUpThread::check_filter(QString fileName, QList<QString> &filters) {
+    QString filter;
+    foreach (filter, filters) {
+        if (fileName.contains(filter), Qt::CaseInsensitive) {
+            return true;
         }
     }
-    QDirIterator copy_dirs(new_dir, QDir::Dirs | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
-    while (copy_dirs.hasNext()) {
-        QString next = copy_dirs.next();
-        QString next_org = QString::fromUtf16(next.utf16());
-        next_org.replace(new_dir, org_dir);
-        if(!QDir(next_org).exists()) {
-            QDir(next).removeRecursively();
-        }
-        QDirIterator copy_files(next, QDir::Files | QDir::NoDotAndDotDot);
-        while (copy_files.hasNext()) {
-            QString next_file = copy_files.next();
-            QString next_file_org = QString::fromUtf16(next_file.utf16());
-            next_file_org.replace(new_dir, org_dir);
-            if (!QFile::exists(next_file_org)) {
-                QFile::remove(next_file);
-                output("Removing: "+next_file);
-            }
-        }
+    return false;
+}
+
+void BackUpThread::copy_file(QString org, QString copy) {
+    if (!QFile::exists(copy)) {
+        QFile::copy(org, copy);
+        output("Creating "+copy);
+    } else if (QFileInfo(org).lastModified() > QFileInfo(copy).lastModified()) {
+        QFile::remove(copy);
+        QFile::copy(org, copy);
+        output("Updating "+copy);
     }
 }
 

@@ -7,9 +7,9 @@ int main(int argc, char *argv[])
 {
 
     QApplication a(argc, argv);
-    QCoreApplication::setOrganizationName("My Company");
-    QCoreApplication::setApplicationName("Back-up Utility");
-    a.setWindowIcon(QIcon(":/Icons/Icons/File Cabinet/1434274439_Card_file.png"));
+    QCoreApplication::setOrganizationName("Jazz History Database");
+    QCoreApplication::setApplicationName("JHDB Dropbox Sorter");
+    a.setWindowIcon(QIcon(":/Icons/Icons/Gerald_G_Trumpet_1.svg"));
 
 
     MainWindow w;

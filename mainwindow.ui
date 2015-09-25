@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>650</width>
-    <height>438</height>
+    <height>440</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,46 +18,29 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="dropbox_folder_label">
         <property name="text">
-         <string>Directories to back-up:</string>
+         <string>Dropbox Folder Location: (You shouldn't need to update this, but in case you do.)</string>
         </property>
        </widget>
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QLineEdit" name="backed_up_dirs_line_edit"/>
+         <widget class="QLineEdit" name="dropbox_folder_lineedit">
+          <property name="placeholderText">
+           <string>ex. /users/JHDB/Dropbox</string>
+          </property>
+         </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="backed_up_dirs_browse">
+         <widget class="QPushButton" name="dropbox_folder_browse">
           <property name="text">
            <string>Browse</string>
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="Line" name="line_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="remove_selected_directory_button">
-          <property name="text">
-           <string>Remove Selected Directories</string>
-          </property>
-         </widget>
-        </item>
        </layout>
-      </item>
-      <item>
-       <widget class="QListWidget" name="backed_up_dirs_list">
-        <property name="selectionMode">
-         <enum>QAbstractItemView::ExtendedSelection</enum>
-        </property>
-       </widget>
       </item>
      </layout>
     </item>
@@ -66,17 +49,21 @@
       <item>
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Directory to back-up to:</string>
+         <string>Directory to copy into Dropbox:</string>
         </property>
        </widget>
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
-         <widget class="QLineEdit" name="back_up_to_line_edit"/>
+         <widget class="QLineEdit" name="dir_to_copy_lineedit">
+          <property name="placeholderText">
+           <string>ex. /users/JHDB/Desktop/</string>
+          </property>
+         </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="back_up_to_browse">
+         <widget class="QPushButton" name="dir_to_copy_browse">
           <property name="text">
            <string>Browse</string>
           </property>
@@ -87,106 +74,11 @@
      </layout>
     </item>
     <item>
-     <widget class="Line" name="line">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_5">
-      <item>
-       <widget class="QCheckBox" name="back_up_on_schedule">
-        <property name="text">
-         <string>Back-up on a schedule?</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="Line" name="line_4">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="back_up_every_label">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="text">
-         <string>Back-up every:</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="days_spinBox">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>365</number>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="days_at_label">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="text">
-         <string>day(s) at:</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QTimeEdit" name="time_timeEdit">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <widget class="Line" name="line_3">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-    </item>
-    <item>
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
-       <widget class="QPushButton" name="save_settings_button">
+       <widget class="QPushButton" name="move_to_dropbox_button">
         <property name="text">
-         <string>Save Settings</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="Line" name="line_6">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="back_up_now">
-        <property name="text">
-         <string>Back-up Now</string>
+         <string>Move to Dropbox</string>
         </property>
        </widget>
       </item>
@@ -202,7 +94,7 @@
     <item>
      <widget class="QLabel" name="label_3">
       <property name="text">
-       <string>Current back-up progress:</string>
+       <string>Current progress:</string>
       </property>
      </widget>
     </item>
@@ -234,28 +126,19 @@
      <x>0</x>
      <y>0</y>
      <width>650</width>
-     <height>20</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionClose"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionClose">
-   <property name="text">
-    <string>Close</string>
-   </property>
-   <property name="toolTip">
-    <string>Close Window</string>
-   </property>
-  </action>
   <action name="actionQuit">
    <property name="text">
     <string>Quit</string>
