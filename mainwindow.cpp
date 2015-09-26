@@ -79,14 +79,14 @@ void MainWindow::on_move_to_dropbox_button_clicked()
 void MainWindow::on_dropbox_folder_browse_clicked() {
     QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "/home",
                   QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    ui->dropbox_folder_browse->setText(dir);
+    ui->dropbox_folder_lineedit->setText(dir);
     this->save_settings();
 }
 
 void MainWindow::on_dir_to_copy_browse_clicked() {
     QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "/home",
                   QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    ui->dir_to_copy_browse->setText(dir);
+    ui->dir_to_copy_lineedit->setText(dir);
 }
 
 void MainWindow::closeEvent(QCloseEvent *)

@@ -22,7 +22,7 @@ void BackUpThread::run() {
     running = true;
     output("Scanning directory...");
 
-    int total_files = count_files(dropbox);
+    int total_files = count_files(archive);
     int processed_files = 0;
 
     copy_files(dropbox, archive, &total_files, &processed_files);
@@ -57,7 +57,7 @@ int BackUpThread::count_files(QString directory) {
 
 void BackUpThread::copy_files(QString new_dir, QString org_dir, int *total_files, int *processed_files) {
     QList<QString> filters;
-    filters << "RAW" << ".mp4" << ".wav" << "HS";
+    filters << "RAW" << ".mp4" << ".wav" << "HR" << ".psd";
 
     // Copy files in current directory
     QDirIterator current_dir_files(org_dir, QDir::Files | QDir::NoDotAndDotDot);
@@ -97,7 +97,7 @@ void BackUpThread::copy_files(QString new_dir, QString org_dir, int *total_files
 bool BackUpThread::check_filter(QString fileName, QList<QString> &filters) {
     QString filter;
     foreach (filter, filters) {
-        if (fileName.contains(filter), Qt::CaseInsensitive) {
+        if (fileName.contains(filter, Qt::CaseInsensitive)) {
             return true;
         }
     }
@@ -117,7 +117,7 @@ void BackUpThread::copy_file(QString org, QString copy) {
 
 void BackUpThread::update_progress(int *total_files, int *processed_files) {
     float current_percent = (float) (*processed_files)/(*total_files)*100;
-    // qDebug() << *total_files << *processed_files;
+    //qDebug() << *total_files << *processed_files;
     progress_changed((int) current_percent);
 }
 

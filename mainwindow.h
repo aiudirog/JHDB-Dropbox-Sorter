@@ -25,12 +25,13 @@ class MainWindow : public QMainWindow
 
         QSettings settings;
         void run_back_up();
-        void get_progress_changed(int prog);
+
 
     private slots:
         void on_move_to_dropbox_button_clicked();
         void on_dropbox_folder_browse_clicked();
         void on_dir_to_copy_browse_clicked();
+        void get_progress_changed(int prog);
 
     signals:
         void progress_changed(int);
